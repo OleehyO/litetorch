@@ -1,6 +1,7 @@
 from ..autograd import Op, Tensor, TensorTuple, Value, TensorOp, TensorTupleOp
 import litetorch.init as init
 
+
 class MakeTensorTuple(TensorTupleOp):
     def compute(self, *args) -> tuple:
         return tuple(args)
@@ -8,7 +9,6 @@ class MakeTensorTuple(TensorTupleOp):
     def gradient(self, out_grad, node):
         assert isinstance(out_grad, TensorTuple)
         return tuple([out_grad[i] for i in range(len(out_grad))])
-
 
 def make_tuple(*args):
     return MakeTensorTuple()(*args)
@@ -38,7 +38,6 @@ class TupleGetItem(TensorOp):
                 in_grad.append(out_grad)
         return MakeTensorTuple()(*in_grad)
 
-
 def tuple_get_item(value, index):
     return TupleGetItem(index)(value)
 
@@ -53,7 +52,6 @@ class FusedAddScalars(TensorTupleOp):
 
     def gradient(self, out_grad, node):
         return out_grad[0] + out_grad[1]
-
 
 def fused_add_scalars(x, c0, c1):
     return FusedAddScalars(c0, c1)(x)

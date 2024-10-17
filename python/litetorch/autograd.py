@@ -158,7 +158,6 @@ class Value:
         return value
 
 
-### Not needed in HW1
 class TensorTuple(Value):
     """Represent a tuple of tensors.
 
@@ -378,11 +377,13 @@ class Tensor(Value):
 
     def permute(self, order):
         return litetorch.ops.Permute(order)(self)
-    
 
     __radd__ = __add__
     __rmul__ = __mul__
     __rmatmul__ = __matmul__
+
+def tensor(data, dtype=None, device=None, requires_grad=False):
+    return Tensor(data, dtype=dtype, device=device, requires_grad=requires_grad)
 
 
 def compute_gradient_of_variables(output_tensor, out_grad):
@@ -390,14 +391,6 @@ def compute_gradient_of_variables(output_tensor, out_grad):
 
     Store the computed result in the grad field of each Variable.
     """
-    # a map from node to a list of gradient contributions from each output node
-    # node_to_output_grads_list: Dict[Tensor, List[Tensor]] = {}
-    # Special note on initializing gradient of
-    # We are really taking a derivative of the scalar reduce_sum(output_node)
-    # instead of the vector output_node. But this is the common case for loss function.
-    # node_to_output_grads_list[output_tensor] = [out_grad]
-
-    # Traverse graph in reverse topological order given the output_node that we are taking gradient wrt.
     reverse_topo_order: List[Tensor] = list(reversed(find_topo_sort([output_tensor])))
 
     loss_node = reverse_topo_order[0]
@@ -419,21 +412,12 @@ def compute_gradient_of_variables(output_tensor, out_grad):
                 f"Shape of input_node.grad and gradients[idx] must be the same, but got {input_node.grad.shape} and {gradients[idx].shape}, node.op: {node.op}"
             input_node.grad += gradients[idx]
 
-
 def find_topo_sort(node_list: List[Value]) -> List[Value]:
-    """Given a list of nodes, return a topological sort list of nodes ending in them.
-
-    A simple algorithm is to do a post-order DFS traversal on the given nodes,
-    going backwards based on input edges. Since a node is added to the ordering
-    after all its predecessors are traversed due to post-order DFS, we get a topological
-    sort.
-    """
     visited = set()
     topo_order = []
     for node in node_list:
         topo_sort_dfs(node, visited, topo_order)
     return topo_order
-
 
 def topo_sort_dfs(node: Value, visited: set, topo_order: List[Value]):
     """Post-order DFS"""
@@ -448,7 +432,6 @@ def topo_sort_dfs(node: Value, visited: set, topo_order: List[Value]):
 ##############################
 ####### Helper Methods #######
 ##############################
-
 
 def sum_node_list(node_list):
     """Custom sum function in order to avoid create redundant nodes in Python sum implementation."""

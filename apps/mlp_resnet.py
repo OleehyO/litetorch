@@ -27,7 +27,6 @@ def ResidualBlock(dim, hidden_dim, norm=nn.BatchNorm1d, drop_prob=0.1):
         nn.ReLU()
     )
 
-
 def MLPResNet(
     dim,
     hidden_dim=100,
@@ -42,7 +41,6 @@ def MLPResNet(
         *[ResidualBlock(hidden_dim, hidden_dim//2, norm, drop_prob) for _ in range(num_blocks)],
         nn.Linear(hidden_dim, num_classes)
     )
-
 
 def epoch(dataloader, model: nn.Module, opt: Optional[ltt.optim.Optimizer]=None):
     np.random.seed(4)

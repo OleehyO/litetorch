@@ -7,13 +7,13 @@ from .ops_mathematic import *
 
 from ..backend_selection import array_api, BACKEND 
 
+
 class LogSoftmax(TensorOp):
     def compute(self, Z):
         raise NotImplementedError()
 
     def gradient(self, out_grad, node):
         raise NotImplementedError()
-
 
 def logsoftmax(a):
     return LogSoftmax()(a)
@@ -40,7 +40,6 @@ class LogSumExp(TensorOp):
         assert inp.shape == local_grad.shape
         out_grad_broadcast = broadcast_to(reshape(out_grad, self.origin_outshape), inp.shape)
         return Tensor(local_grad, dtype=node.dtype) * out_grad_broadcast
-
 
 def logsumexp(a, axes=None):
     return LogSumExp(axes=axes)(a)

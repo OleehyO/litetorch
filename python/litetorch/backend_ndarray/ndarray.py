@@ -83,7 +83,6 @@ def all_devices():
 
 
 class NDArray:
-
     def __init__(self, other, device=None):
         """Create by copying another NDArray, or from numpy"""
         if isinstance(other, NDArray):

@@ -1,10 +1,8 @@
 """The module.
 """
-from typing import List, Callable, Any
 from litetorch.autograd import Tensor
 from litetorch import ops
 import litetorch.init as init
-import numpy as np
 from .nn_basic import Parameter, Module
 
 

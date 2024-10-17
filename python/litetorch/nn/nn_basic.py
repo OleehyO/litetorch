@@ -1,10 +1,9 @@
 """The module.
 """
-from typing import List, Callable, Any
+from typing import List
 from litetorch.autograd import Tensor
 from litetorch import ops
 import litetorch.init as init
-import numpy as np
 
 
 class Parameter(Tensor):
@@ -28,7 +27,6 @@ def _unpack_params(value: object) -> List[Tensor]:
         return params
     else:
         return []
-
 
 def _child_modules(value: object) -> List["Module"]:
     if isinstance(value, Module):

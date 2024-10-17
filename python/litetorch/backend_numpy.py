@@ -52,10 +52,8 @@ def cpu():
     """Return cpu device"""
     return CPUDevice()
 
-
 def default_device():
     return cpu()
-
 
 def all_devices():
     """return a list of all available devices"""

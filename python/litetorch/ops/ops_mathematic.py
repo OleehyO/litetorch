@@ -18,7 +18,6 @@ class EWiseAdd(TensorOp):
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         return out_grad, out_grad
 
-
 def add(a: Tensor, b: Tensor) -> Tensor:
     return EWiseAdd()(a, b)
 
@@ -33,7 +32,6 @@ class AddScalar(TensorOp):
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         return (out_grad,)
 
-
 def add_scalar(a: Tensor, scalar: Number) -> Tensor:
     return AddScalar(scalar)(a)
 
@@ -45,7 +43,6 @@ class EWiseMul(TensorOp):
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         lhs, rhs = node.inputs
         return out_grad * rhs, out_grad * lhs
-
 
 def multiply(a: Tensor, b: Tensor) -> Tensor:
     return EWiseMul()(a, b)
@@ -60,7 +57,6 @@ class MulScalar(TensorOp):
 
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         return (out_grad * self.scalar,)
-
 
 def mul_scalar(a: Tensor, scalar: Number) -> Tensor:
     return MulScalar(scalar)(a)
@@ -102,7 +98,6 @@ class PowerScalar(TensorOp):
         assert out_grad.shape == local_grad.shape == node.inputs[0].shape
         return (out_grad * local_grad,)
 
-
 def power_scalar(a: Tensor, scalar: Number) -> Tensor:
     return PowerScalar(scalar)(a)
 
@@ -124,7 +119,6 @@ class EWiseDiv(TensorOp):
 
         assert numer_grad.shape == numer.shape and denom_grad.shape == denom.shape
         return (numer_grad, denom_grad)
-
 
 def divide(a: Tensor, b: Tensor) -> Tensor:
     return EWiseDiv()(a, b)
@@ -148,7 +142,6 @@ class DivScalar(TensorOp):
         assert out_grad.shape == local_grad.shape == numer.shape
         return out_grad * local_grad
 
-
 def divide_scalar(a: Tensor, scalar: Number) -> Tensor:
     return DivScalar(scalar)(a)
 
@@ -170,7 +163,6 @@ class Transpose(TensorOp):
         assert res.shape == node.inputs[0].shape
         return (res,)
 
-
 def transpose(a: Tensor, axes: Optional[tuple] = None) -> Tensor:
     return Transpose(axes)(a)
 
@@ -187,7 +179,6 @@ class Reshape(TensorOp):
         res = reshape(out_grad, node.inputs[0].shape)
         assert res.shape == node.inputs[0].shape
         return (res,)
-
 
 def reshape(a: Tensor, shape: tuple) -> Tensor:
     return Reshape(shape)(a)
@@ -226,7 +217,6 @@ class BroadcastTo(TensorOp):
         assert res.shape == node.inputs[0].shape
         return (res, )
 
-
 def broadcast_to(a: Tensor, shape: tuple) -> Tensor:
     return BroadcastTo(shape)(a)
 
@@ -255,7 +245,6 @@ class Summation(TensorOp):
         assert res.shape == node.inputs[0].shape
         return res
 
-
 def summation(a: Tensor, axes: Optional[tuple] = None) -> Tensor:
     return Summation(axes)(a)
 
@@ -283,7 +272,6 @@ class MatMul(TensorOp):
         assert X_grad.shape == X.shape and Y_grad.shape == Y.shape
         return (X_grad, Y_grad)
 
-
 def matmul(a: Tensor, b: Tensor) -> Tensor:
     return MatMul()(a, b)
 
@@ -295,7 +283,6 @@ class Negate(TensorOp):
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         assert out_grad.shape == node.inputs[0].shape
         return (-out_grad,)
-
 
 def negate(a: Tensor) -> Tensor:
     return Negate()(a)
@@ -312,7 +299,6 @@ class Log(TensorOp):
         assert res.shape == node.inputs[0].shape
         return (res,)
 
-
 def log(a: Tensor) -> Tensor:
     return Log()(a)
 
@@ -325,7 +311,6 @@ class Exp(TensorOp):
         assert len(node.inputs) == 1
         assert out_grad.shape == node.shape
         return (out_grad * node, )
-
 
 def exp(a: Tensor) -> Tensor:
     return Exp()(a)
@@ -343,9 +328,9 @@ class ReLU(TensorOp):
         assert local_grad.shape == out_grad.shape == node.inputs[0].shape
         return (local_grad * out_grad,)
 
-
 def relu(a: Tensor) -> Tensor:
     return ReLU()(a)
+
 
 class Tanh(TensorOp):
     def compute(self, a: NDArray) -> NDArray: # type: ignore
@@ -356,9 +341,9 @@ class Tanh(TensorOp):
         assert out_grad.shape == node.shape
         return (out_grad * (1 - (node ** 2)), )
 
-
 def tanh(a: Tensor) -> Tensor:
     return Tanh()(a)
+
 
 class GetItem(TensorOp):
     def __init__(self, index):
@@ -428,19 +413,16 @@ class Stack(TensorOp):
         assert out_grad.shape == node.shape
         res = split(out_grad, self.axis)
         assert res.shape[0] == len(node.inputs)
-        # return (res, )
         ret = []
         for i in range(res.shape[0]):
             ret.append(res[i])
         return tuple(ret)
-
 
 def stack(args: Union[tuple, list], axis: int) -> Tensor:
     assert isinstance(axis, int)
     if not (isinstance(args, tuple) or isinstance(args, list)):
         raise ValueError("args must be a tuple or list")
     return Stack(axis)(*args)
-
 
 # class Split(TensorTupleOp):
 class Split(TensorOp):
@@ -454,7 +436,6 @@ class Split(TensorOp):
         assert isinstance(axis, int)
         self.axis = axis
 
-    # def compute(self, A: NDArray) -> List[NDArray]: # type: ignore
     def compute(self, A: NDArray) -> NDArray: # type: ignore
         # (4,5,6,7) -> (6,4,5,7) when axis = 2
         nsplit = A.shape[self.axis]
@@ -463,20 +444,15 @@ class Split(TensorOp):
         self.new_order = new_order
 
         tmpA = array_api.transpose(A, new_order)
-        # res = [array_api.empty(new_shape, device=A.device) for _ in range(nsplit)]
         res = []
         for i in range(nsplit):
-            # res[i] = tmpA[i]  # bug here
             res.append((tmpA[i] + 0).numpy())  # copy a new array
-        # return res
         return array_api.array(res, device=A.device)
 
 
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         # node are Tensor that has been split
-        # return (stack(out_grad, self.axis), )
         return (permute(out_grad, find_positions(self.new_order)) ,)
-
 
 def split(a: Tensor, axis: int) -> Tensor:
     return Split(axis)(a)
@@ -496,7 +472,6 @@ class Flip(TensorOp):
 
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         return (flip(out_grad, self.axes),)
-
 
 def flip(a, axes):
     return Flip(axes)(a)
@@ -529,7 +504,6 @@ class Dilate(TensorOp):
     def gradient(self, out_grad: Tensor, node: Tensor) -> Tuple[Tensor]:
         return (undilate(out_grad, self.axes, self.dilation),)
 
-
 def dilate(a, axes, dilation):
     return Dilate(axes, dilation)(a)
 
@@ -558,7 +532,6 @@ class UnDilate(TensorOp):
         
     def gradient(self, out_grad, node):
         return (dilate(out_grad, self.axes, self.dilation),)
-
 
 def undilate(a, axes, dilation):
     return UnDilate(axes, dilation)(a)
@@ -646,7 +619,6 @@ class Conv(TensorOp):
         A_grad = A_grad[:, self.padding:self.padding+A.shape[1], self.padding:self.padding+A.shape[2], :]
         assert A_grad.shape == A.shape, "A_grad.shape != A.shape"
         return (A_grad, B_grad)
-
 
 def conv(a, b, stride=1, padding=1):
     return Conv(stride, padding)(a, b)
