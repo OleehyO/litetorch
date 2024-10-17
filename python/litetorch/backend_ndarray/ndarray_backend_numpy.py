@@ -1,6 +1,5 @@
 import numpy as np
 
-
 __device_name__ = "numpy"
 _datatype = np.float32
 _datetype_size = np.dtype(_datatype).itemsize
